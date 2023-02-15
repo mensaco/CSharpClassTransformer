@@ -8,8 +8,8 @@
         text-shadow: 0px 0px 2px rgba(50,50,50,0.3);
     }  
 
-    .form-control {
-        @apply w-full p-2 border border-gray-300;
+    input, pre {
+        @apply text-amber-800 w-full md:w-[23rem] p-2 bg-gray-50 border border-gray-200;
     }
-       
+
 }

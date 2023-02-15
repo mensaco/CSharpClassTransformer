@@ -1,16 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>C# Class Transformer</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/settings.js"></script>
     <script src="/js/knockout-3.5.1.js" defer></script>
     <script src="/js/index.knockout.js" defer></script>
 </head>
-<body>
-    
+
+<body spellcheck="false" class="bg-gray-300">
+    <div class="m-3 flex flex-wrap gap-3">
+        <div class="grid gap-3">
+            <label for="inputbox">
+                <div class="mb-1">C# class text:</div>
+                <pre id="inputbox" class="overflow-scroll" contenteditable="true" data-bind="editableHTML: inputHtml">
+                </pre>
+            </label>
+        </div>
+        <div class="flex flex-col gap-3">
+            <label for="className">
+                <div class="mb-1">C# class name:</div>
+                <pre id="className" data-bind="text: className"></pre>
+            </label>
+            <label for="properties">
+                <div class="mb-1">C# class properties:</div>
+                <pre id="properties" class="overflow-scroll" contenteditable="true" data-bind="html: properties"></pre>
+            </label>
+            <label for="blazordisplays">
+                <div class="mb-1">Blazor inputs:</div>
+                <pre id="blazordisplays" class="overflow-scroll" contenteditable="true"
+                    data-bind="text: blazorDisplays().join('\r\n')">
+
+            </pre>
+            </label>
+            <label for="blazorinputs">
+                <div class="mb-1">Blazor inputs:</div>
+                <pre id="blazorinputs" class="overflow-scroll" contenteditable="true"
+                    data-bind="text: blazorInputs().join('\r\n')">
+
+            </pre>
+            </label>
+        </div>
+
+
+    </div>
 
 </body>
+
 </html>
