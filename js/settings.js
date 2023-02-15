@@ -10,6 +10,23 @@ const Settings = {
         }
     },
     "Templates":{
+        "CSharp":{
+            "Filter": {
+                "Class": `
+using CommunityToolkit.Mvvm.ComponentModel;
+namespace {Namespace};
+
+public partial class {Model}Filter:  ObservableObject
+{
+    {Properties}
+}
+                `,
+                "Property" : `
+    [ObservableProperty]
+    private string? {property};    
+`
+            }
+        },
         "Blazor":{
             "Types":{
                 "Guid": "text",

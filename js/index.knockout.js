@@ -18,54 +18,65 @@ function Camel(s) {
     return s1 + s.substring(1)
 }
 
-class ViewModel {
-    constructor() {
-        var self = this;       
+function CopyElementContentsToClipboard(elementId) {
+    var element = document.getElementById(elementId);
 
-        self.inputHtml = ko.observable(`
-    using System;
-using System.Collections.Generic;
+    if (element.textContent) {
+        navigator.clipboard.writeText(element.textContent);
+        return;
+    }
 
-namespace Saalreservierung.Models;
 
-public partial class Room
-{
-    public Guid Id { get; set; }
+    // Copy the text inside the text field
 
-    public int? SrcId { get; set; }
+    if (element.value) {
+        navigator.clipboard.writeText(element.value);
+        // Select the text field
+        element.select();
+        element.setSelectionRange(0, 99999); // For mobile devices
+    }
+    else {
+        console.log("Element property to copy not implemented.")
+    }
 
-    public string Name { get; set; } = null!;
 
-    public string? Number { get; set; }
-
-    public bool? Approved { get; set; }
-
-    public bool? Locked { get; set; }
-
-    public bool? IsExternal { get; set; }
-
-    public bool? UiShowInOverview { get; set; }
-
-    public bool? UiUseAsFilter { get; set; }
-
-    public int? UiSortOrder { get; set; }
-
-    public string? Building { get; set; }
-
-    public string? MaxPersonsNumText { get; set; }
-
-    public string? Phone { get; set; }
-
-    public string? Comment { get; set; }
-
-    public virtual ICollection<Reservation> Reservations { get; } = new List<Reservation>();
-
-    public virtual ICollection<RoomBooking> RoomBookings { get; } = new List<RoomBooking>();
-
-    public virtual RoomCalender? RoomCalender { get; set; }
 }
 
-    `);
+[...document.querySelectorAll("label > div > svg")].forEach(s => {
+    s.addEventListener("click", (e) => {
+        const id = e.currentTarget.parentElement.parentElement.getAttribute("for")
+        if (!id) return;
+        CopyElementContentsToClipboard(id);
+    })
+})
+
+class ViewModel {
+    constructor() {
+        var self = this;
+
+        self.bytes = ko.observableArray()
+
+        self.inputHtml = ko.observable(`public partial class Room
+{
+    public Guid Id { get; set; }
+    public int? SrcId { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Number { get; set; }
+    public bool? Approved { get; set; }
+    public bool? Locked { get; set; }
+    public bool? IsExternal { get; set; }
+    public bool? UiShowInOverview { get; set; }
+    public bool? UiUseAsFilter { get; set; }
+    public int? UiSortOrder { get; set; }
+    public string? Building { get; set; }
+    public string? MaxPersonsNumText { get; set; }
+    public string? Phone { get; set; }
+    public string? Comment { get; set; }
+    public virtual ICollection Reservations { get; } = new List();
+    public virtual ICollection RoomBookings { get; } = new List();
+    public virtual RoomCalender? RoomCalender { get; set; }
+}        
+`);
 
         self.className = ko.pureComputed(function () {
             // extract class name
@@ -79,7 +90,7 @@ public partial class Room
             return "";
         });
 
-        self.camelClassName = ko.pureComputed(function(){
+        self.camelClassName = ko.pureComputed(function () {
             return Camel(self.className());
         })
 
@@ -97,6 +108,23 @@ public partial class Room
             return self.propList().map(x => x[0] + ' ' + x[1]).join('\r\n');
         }, self);
 
+        self.attributes = ko.pureComputed(function () {
+            return self.propList().map(x => 'string? ' + Camel(x[1])).join(', ');
+        }, self);
+
+        self.filterClass = ko.pureComputed(function () {
+            const ct = Settings.Templates.CSharp.Filter.Class;
+            const pt = Settings.Templates.CSharp.Filter.Property;
+
+            const properties = self.propList().map(x => pt
+                .replace("{property}", Camel(x[1]))
+            ).join('');
+
+            return ct
+                .replace("{Model}", self.className())
+                .replace("{Properties}", properties)
+        }, self);
+
         self.blazorInputs = ko.pureComputed(function () {
             const T = Settings.Templates.Blazor.Input;
             const Ty = Settings.Templates.Blazor.Types;
@@ -105,7 +133,7 @@ public partial class Room
                 .replace("{property}", Camel(x[1]))
                 .replace("{type}", Ty[x[0]])
                 .replace("{model}", self.camelClassName())
-                );
+            );
         }, self);
 
         self.blazorDisplays = ko.pureComputed(function () {
@@ -115,7 +143,7 @@ public partial class Room
                 .replace("{label}", x[1])
                 .replace("{property}", Camel(x[1]))
                 .replace("{model}", self.camelClassName()))
-            }, self);
+        }, self);
 
 
 
