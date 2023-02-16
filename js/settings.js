@@ -50,8 +50,38 @@ public partial class {Model}Filter:  ObservableObject
                 "Filter": {
                     "Class":``,
                     "Linq":{
-                        "string": ` q = q.Where(x => x.{Property}.Contains({searchText}));`,
-                        "string?": ` q = q.Where(x => x.{Property} != null && x.{Property}.Contains({searchText}));`,
+                        "string": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
+}`,
+                        "string?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
+}`,
+                        "bool": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} == {model}Filter.{Property});
+}`,
+                        "bool?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+}`,
+                        "int": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} == {model}Filter.{Property});
+}`,
+                        "int?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+}`,
+                        "Guid": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} == {model}Filter.{Property});
+}`,
+                        "Guid?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+}`,
                     }
                 }
             }            

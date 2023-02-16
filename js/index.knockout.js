@@ -111,6 +111,15 @@ class ViewModel {
                 .replace("{Properties}", properties)
         }, self);
 
+
+        self.linqFilter = ko.pureComputed(function(){
+            const cn = Camel(self.className());
+            return self.propList().map(x => Settings.Templates.CSharp.Controller.Filter.Linq[x[0]]
+                .replace(/\{Property\}/g, x[1])
+                .replace(/\{model\}/g, cn)
+                )
+        });
+
         self.blazorInputs = ko.pureComputed(function () {
             const T = Settings.Templates.Blazor.Input;
             const Ty = Settings.Templates.Blazor.Types;
