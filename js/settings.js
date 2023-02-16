@@ -11,6 +11,26 @@ const Settings = {
     },
     "Templates":{
         "CSharp":{
+            "InitialClass":`public partial class Room
+{
+    public Guid Id { get; set; }
+    public int? SrcId { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Number { get; set; }
+    public bool? Approved { get; set; }
+    public bool? Locked { get; set; }
+    public bool? IsExternal { get; set; }
+    public bool? UiShowInOverview { get; set; }
+    public bool? UiUseAsFilter { get; set; }
+    public int? UiSortOrder { get; set; }
+    public string? Building { get; set; }
+    public string? MaxPersonsNumText { get; set; }
+    public string? Phone { get; set; }
+    public string? Comment { get; set; }
+    public virtual ICollection Reservations { get; } = new List();
+    public virtual ICollection RoomBookings { get; } = new List();
+    public virtual RoomCalender? RoomCalender { get; set; }
+}`,
             "Filter": {
                 "Class": `using CommunityToolkit.Mvvm.ComponentModel;
 namespace {Namespace};
@@ -24,7 +44,17 @@ public partial class {Model}Filter:  ObservableObject
     [ObservableProperty]
     private string? {property};    
 `
-            }
+            },
+            "Controller": {
+                "CRUD": ``,
+                "Filter": {
+                    "Class":``,
+                    "Linq":{
+                        "string": ` q = q.Where(x => x.{Property}.Contains({searchText}));`,
+                        "string?": ` q = q.Where(x => x.{Property} != null && x.{Property}.Contains({searchText}));`,
+                    }
+                }
+            }            
         },
         "Blazor":{
             "Types":{

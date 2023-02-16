@@ -1,3 +1,4 @@
+// -----------------------------------------
 ko.bindingHandlers.editableHTML = {
     init: function (element, valueAccessor) {
         //var $element = $(element);
@@ -10,6 +11,7 @@ ko.bindingHandlers.editableHTML = {
     }
 };
 
+// -----------------------------------------
 function Camel(s) {
     if (!s) return "";
     const s1 = s[0].toLowerCase();
@@ -18,6 +20,7 @@ function Camel(s) {
     return s1 + s.substring(1)
 }
 
+// -----------------------------------------
 function CopyElementContentsToClipboard(elementId) {
     var element = document.getElementById(elementId);
 
@@ -42,6 +45,8 @@ function CopyElementContentsToClipboard(elementId) {
 
 }
 
+
+// -----------------------------------------
 [...document.querySelectorAll("label > div > svg")].forEach(s => {
     s.addEventListener("click", (e) => {
         const id = e.currentTarget.parentElement.parentElement.getAttribute("for")
@@ -50,33 +55,14 @@ function CopyElementContentsToClipboard(elementId) {
     })
 })
 
+// -----------------------------------------
 class ViewModel {
     constructor() {
         var self = this;
 
         self.bytes = ko.observableArray()
 
-        self.inputHtml = ko.observable(`public partial class Room
-{
-    public Guid Id { get; set; }
-    public int? SrcId { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Number { get; set; }
-    public bool? Approved { get; set; }
-    public bool? Locked { get; set; }
-    public bool? IsExternal { get; set; }
-    public bool? UiShowInOverview { get; set; }
-    public bool? UiUseAsFilter { get; set; }
-    public int? UiSortOrder { get; set; }
-    public string? Building { get; set; }
-    public string? MaxPersonsNumText { get; set; }
-    public string? Phone { get; set; }
-    public string? Comment { get; set; }
-    public virtual ICollection Reservations { get; } = new List();
-    public virtual ICollection RoomBookings { get; } = new List();
-    public virtual RoomCalender? RoomCalender { get; set; }
-}        
-`);
+        self.inputHtml = ko.observable(Settings.Templates.CSharp.InitialClass);
 
         self.className = ko.pureComputed(function () {
             // extract class name
