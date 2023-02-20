@@ -11,6 +11,35 @@ ko.bindingHandlers.editableHTML = {
     }
 };
 
+function AugmentHtml() {
+
+    var cards = document.querySelectorAll("card");
+    for(var i = cards.length - 1; i >= 0; i--){
+        var cd = cards[i];
+        const name = cd.getAttribute("name")
+        const title = cd.getAttribute("title")
+        const bind = cd.getAttribute("bind")
+
+        const newOHTML = Settings.Templates.Html.card
+            .replace(/\{name\}/g, name)
+            .replace(/\{title\}/g, title)
+            .replace(/\{bind\}/g, bind + ": " + name)
+
+        
+
+        cd.outerHTML =  newOHTML;
+        
+        var dummy = 0
+    }
+    
+
+    [...document.querySelectorAll("svgHere")].forEach(sh => {
+        sh.outerHTML = Settings.Templates.Html.svgHere
+    });
+}
+
+AugmentHtml();
+
 // -----------------------------------------
 function Camel(s) {
     if (!s) return "";
@@ -21,8 +50,8 @@ function Camel(s) {
 }
 
 // -----------------------------------------
-function CopyElementContentsToClipboard(elementId) {
-    var element = document.getElementById(elementId);
+function CopyElementContentsToClipboard(e) {
+    var element = e.srcElement.parentElement.parentElement.nextElementSibling
 
     if (element.textContent) {
         navigator.clipboard.writeText(element.textContent);
@@ -45,13 +74,11 @@ function CopyElementContentsToClipboard(elementId) {
 
 }
 
-
 // -----------------------------------------
-[...document.querySelectorAll("label > div > svg")].forEach(s => {
+[...document.querySelectorAll(".label > div > svg")].forEach(s => {
     s.addEventListener("click", (e) => {
-        const id = e.currentTarget.parentElement.parentElement.getAttribute("for")
-        if (!id) return;
-        CopyElementContentsToClipboard(id);
+        e.stopPropagation()        
+        CopyElementContentsToClipboard(e);
     })
 })
 
@@ -62,6 +89,15 @@ class ViewModel {
 
         self.bytes = ko.observableArray()
 
+        self.toggleclassName = ko.observable(true)
+        self.toggleproperties = ko.observable(true)
+        self.togglekeyProperties = ko.observable(true)
+        self.togglefilterClass = ko.observable(true)
+        self.toggleattributes = ko.observable(true)
+        self.togglelinqFilter = ko.observable(true)
+        self.toggleblazorDisplays = ko.observable(true)
+        self.toggleblazorInputs = ko.observable(true)
+        
         self.inputHtml = ko.observable(Settings.Templates.CSharp.InitialClass);
 
         self.className = ko.pureComputed(function () {
@@ -89,6 +125,17 @@ class ViewModel {
             return a;
         });
 
+        self.keyProperties = ko.pureComputed(function(){
+            // extract properties decorated with the [Key] - attribute
+            const pp = Settings.RegExp.ForKeyAttribute;
+            const r = new RegExp(pp.Expression, pp.Flags)
+            var a = []
+            self.inputHtml().replace(r, function (m, p1) { 
+                a.push(p1); 
+            });
+            return a.join("\r\n");            
+        })
+
 
         self.properties = ko.pureComputed(function () {
             return self.propList().map(x => x[0] + ' ' + x[1]).join('\r\n');
@@ -112,12 +159,12 @@ class ViewModel {
         }, self);
 
 
-        self.linqFilter = ko.pureComputed(function(){
-            const cn = Camel(self.className());
+        self.linqFilter = ko.pureComputed(function () {
+            const cn = Camel(self.camelClassName());
             return self.propList().map(x => Settings.Templates.CSharp.Controller.Filter.Linq[x[0]]
                 .replace(/\{Property\}/g, x[1])
                 .replace(/\{model\}/g, cn)
-                )
+            ).join('\r\n')
         });
 
         self.blazorInputs = ko.pureComputed(function () {
@@ -128,7 +175,7 @@ class ViewModel {
                 .replace("{property}", Camel(x[1]))
                 .replace("{type}", Ty[x[0]])
                 .replace("{model}", self.camelClassName())
-            );
+            ).join('\r\n');
         }, self);
 
         self.blazorDisplays = ko.pureComputed(function () {
@@ -137,7 +184,7 @@ class ViewModel {
             return self.propList().map(x => T
                 .replace("{label}", x[1])
                 .replace("{property}", Camel(x[1]))
-                .replace("{model}", self.camelClassName()))
+                .replace("{model}", self.camelClassName())).join('\r\n')
         }, self);
 
 
