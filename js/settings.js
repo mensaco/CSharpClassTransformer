@@ -37,7 +37,10 @@ const Settings = {
         "CSharp":{
             "InitialClass":`public partial class Room
 {
-    public Guid Id { get; set; }
+    [Key]
+    public Guid FirstId { get; set; }
+    [Key]
+    public Guid SecondId { get; set; }
     public int? SrcId { get; set; }
     public string Name { get; set; } = null!;
     public string? Number { get; set; }
