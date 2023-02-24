@@ -16,7 +16,7 @@
             },
             {
                 "match": "\\.js$",
-                "cmd": "echo 'I am a .js file ${file}.'"
+                "cmd": "RebuildTailwindCss.bat"
             }
         ]
     }

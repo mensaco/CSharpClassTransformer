@@ -14,7 +14,7 @@ ko.bindingHandlers.editableHTML = {
 function AugmentHtml() {
 
     var cards = document.querySelectorAll("card");
-    for(var i = cards.length - 1; i >= 0; i--){
+    for (var i = cards.length - 1; i >= 0; i--) {
         var cd = cards[i];
         const name = cd.getAttribute("name")
         const title = cd.getAttribute("title")
@@ -25,16 +25,21 @@ function AugmentHtml() {
             .replace(/\{title\}/g, title)
             .replace(/\{bind\}/g, bind + ": " + name)
 
-        
+        cd.outerHTML = newOHTML;
 
-        cd.outerHTML =  newOHTML;
-        
         var dummy = 0
     }
-    
+
+
+    [...document.querySelectorAll("transformer")].forEach(sh => {
+        const index = sh.getAttribute("index")
+        const oh = Settings.Templates.Html.transformer.replace(/\{index\}/gi, index)
+        sh.outerHTML = oh
+    });
 
     [...document.querySelectorAll("svgHere")].forEach(sh => {
-        sh.outerHTML = Settings.Templates.Html.svgHere
+        const oh = Settings.Templates.Html.svgHere
+        sh.outerHTML = oh
     });
 }
 
@@ -58,9 +63,7 @@ function CopyElementContentsToClipboard(e) {
         return;
     }
 
-
     // Copy the text inside the text field
-
     if (element.value) {
         navigator.clipboard.writeText(element.value);
         // Select the text field
@@ -70,35 +73,29 @@ function CopyElementContentsToClipboard(e) {
     else {
         console.log("Element property to copy not implemented.")
     }
-
-
 }
 
-// -----------------------------------------
-[...document.querySelectorAll(".label > div > svg")].forEach(s => {
-    s.addEventListener("click", (e) => {
-        e.stopPropagation()        
-        CopyElementContentsToClipboard(e);
-    })
-})
+
+
+
 
 // -----------------------------------------
 class ViewModel {
     constructor() {
         var self = this;
 
-        self.bytes = ko.observableArray()
-
-        self.toggleclassName = ko.observable(true)
-        self.toggleproperties = ko.observable(true)
-        self.togglekeyProperties = ko.observable(true)
-        self.togglefilterClass = ko.observable(true)
-        self.toggleattributes = ko.observable(true)
-        self.togglelinqFilter = ko.observable(true)
-        self.toggleblazorDisplays = ko.observable(true)
-        self.toggleblazorInputs = ko.observable(true)
+        self.txtDiv = document.createElement("div")
         
+        self.showInputContent = ko.observable(true)
+
         self.inputHtml = ko.observable(Settings.Templates.CSharp.InitialClass);
+
+        self.copy = function (text) {
+            if(navigator && navigator.clipboard) {                
+                self.txtDiv.textContent = text
+                navigator.clipboard.writeText(self.txtDiv.textContent)                
+            }        
+        }
 
         self.className = ko.pureComputed(function () {
             // extract class name
@@ -112,88 +109,61 @@ class ViewModel {
             return "";
         });
 
-        self.camelClassName = ko.pureComputed(function () {
-            return Camel(self.className());
-        })
-
-        self.propList = ko.pureComputed(function () {
-            // extract properties
+        self.properties = ko.pureComputed(function () {
+            // extract simple C# property names and types
             const pp = Settings.RegExp["ForC#Properties"];
             const r = new RegExp(pp.Expression, pp.Flags);
             var a = [];
-            self.inputHtml().replace(r, function (m, p1) { a.push(p1.split(' ')); });
-            return a;
-        });
+            self.inputHtml().replace(r, function (m, p1, p2) {
+                a.push([p2, p1])
+            })
 
-        self.keyProperties = ko.pureComputed(function(){
+            return a;
+        })
+
+        self.keyProperties = ko.pureComputed(function () {
             // extract properties decorated with the [Key] - attribute
             const pp = Settings.RegExp.ForKeyAttribute;
             const r = new RegExp(pp.Expression, pp.Flags)
             var a = []
-            self.inputHtml().replace(r, function (m, p1) { 
-                a.push(p1); 
+            self.inputHtml().replace(r, function (m, p1) {
+                a.push(p1);
             });
-            return a.join("\r\n");            
+            return a;
         })
 
-
-        self.properties = ko.pureComputed(function () {
-            return self.propList().map(x => x[0] + ' ' + x[1]).join('\r\n');
-        }, self);
-
-        self.attributes = ko.pureComputed(function () {
-            return self.propList().map(x => 'string? ' + Camel(x[1])).join(', ');
-        }, self);
-
-        self.filterClass = ko.pureComputed(function () {
-            const ct = Settings.Templates.CSharp.Filter.Class;
-            const pt = Settings.Templates.CSharp.Filter.Property;
-
-            const properties = self.propList().map(x => pt
-                .replace("{property}", Camel(x[1]))
-            ).join('');
-
-            return ct
-                .replace("{Model}", self.className())
-                .replace("{Properties}", properties)
-        }, self);
-
-
-        self.linqFilter = ko.pureComputed(function () {
-            const cn = Camel(self.camelClassName());
-            return self.propList().map(x => Settings.Templates.CSharp.Controller.Filter.Linq[x[0]]
-                .replace(/\{Property\}/g, x[1])
-                .replace(/\{model\}/g, cn)
-            ).join('\r\n')
-        });
-
-        self.blazorInputs = ko.pureComputed(function () {
-            const T = Settings.Templates.Blazor.Input;
-            const Ty = Settings.Templates.Blazor.Types;
-            return self.propList().map(x => T
-                .replace("{label}", x[1])
-                .replace("{property}", Camel(x[1]))
-                .replace("{type}", Ty[x[0]])
-                .replace("{model}", self.camelClassName())
-            ).join('\r\n');
-        }, self);
-
-        self.blazorDisplays = ko.pureComputed(function () {
-            const T = Settings.Templates.Blazor.Display;
-            const Ty = Settings.Templates.Blazor.Types;
-            return self.propList().map(x => T
-                .replace("{label}", x[1])
-                .replace("{property}", Camel(x[1]))
-                .replace("{model}", self.camelClassName())).join('\r\n')
-        }, self);
-
-
-
+        self.transformers = ko.observableArray([])
 
     }
 }
 
 
-var vM = new ViewModel();
+window.vM = new ViewModel();
 
-ko.applyBindings(vM);
+ko.applyBindings(window.vM);
+
+Settings.Transformations.forEach(t => {
+    var source = window.vM.properties
+    var tr = {};
+    tr.showContent = ko.observable(true)
+    tr.title = t.title
+    if (!!t.source) {
+        source = t.source
+    }
+    var pre = t.pretext ? t.pretext() : "";
+    var pst = t.posttext ? t.posttext() : "";
+    var mapJoiner = '\r\n'
+
+    if(t.mapJoiner){
+        mapJoiner = t.mapJoiner
+    }
+
+    var mid = "";
+    if (t.mapping) {
+        mid = source().map(x => t.mapping(x)).join(mapJoiner)
+    }
+
+    tr.text = pre + mid + pst
+    window.vM.transformers.push(tr)
+});
+
