@@ -8,9 +8,21 @@
         font-size: 16px;
     }
 
-    pre {
+    .main > div {
+        @apply min-w-[22em] flex-1;
+    }
+
+    pre, textarea {
         @apply whitespace-pre-line max-h-80 p-3 overflow-y-scroll bg-white;
     } 
+
+    textarea {
+        @apply w-full;
+    } 
+
+    pre {
+        @apply overflow-x-scroll whitespace-pre-wrap;;
+    }
 
     
 }

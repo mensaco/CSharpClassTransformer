@@ -130,6 +130,14 @@ public partial class {Model}Filter:  ObservableObject
 {
     q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
 }`,
+                        "System.String": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
+}`,
+                        "System.String?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
+}`,
                         "bool": `if({model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property} == {model}Filter.{Property});
@@ -143,6 +151,14 @@ public partial class {Model}Filter:  ObservableObject
     q = q.Where(x => x.{Property} == {model}Filter.{Property});
 }`,
                         "int?": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+}`,
+                        "System.UInt64": `if({model}Filter.{Property} != null) 
+{
+    q = q.Where(x => x.{Property} == {model}Filter.{Property});
+}`,
+                        "System.UInt64?": `if({model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
 }`,
@@ -179,11 +195,11 @@ public partial class {Model}Filter:  ObservableObject
             },
             "Input": `<div>
     <label>{label}</label>
-    <input type="{type}" @bind="@{model}.{property}" />
+    <input type="{type}" @bind="@{model}.{Property}" />
 </div>`,
             "Display": `<div>
     <label>{label}</label>
-    <div>@{model}.{property}</div>
+    <div>@{model}.{Property}</div>
 </div>`
 
         }
