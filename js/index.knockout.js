@@ -8,28 +8,37 @@ String.prototype.toCamelCase = function() {
     return s1 + s.substring(1)
 }
 
+class Property {
+    constructor(name, type) {
+        var self = this;
+        self.name = name;
+        self.type = type;
+    }
+}
+
+class Model {
+    constructor(name, properties, keys) {
+        var self = this;
+        self.name = name;
+        self.properties = properties;
+        self.keys = keys;
+    }
+}
 
 
 // -----------------------------------------
-function CopyElementContentsToClipboard(e) {
-    var element = e.srcElement.parentElement.parentElement.nextElementSibling
+function copyText(text) {
+
+    var element = document.getElementById("copytext")
+    element.textContent = text()
 
     if (element.textContent) {
         navigator.clipboard.writeText(element.textContent);
         return;
     }
-
-    // Copy the text inside the text field
-    if (element.value) {
-        navigator.clipboard.writeText(element.value);
-        // Select the text field
-        element.select();
-        element.setSelectionRange(0, 99999); // For mobile devices
-    }
-    else {
-        console.log("Element property to copy not implemented.")
-    }
+    
 }
+
 
 
 /* Add one or more listeners to an element
@@ -72,7 +81,7 @@ ko.bindingHandlers.editableHTML = {
     init: function (element, valueAccessor) {
         var observable = valueAccessor();
         element.setAttribute('contenteditable', 'true')
-        addListenerMulti(element, 'keyup input cut paste drag dragdrop', function () {
+        addListenerMulti(element, 'blur', function () {
             observable(element.textContent);
         });
     },
@@ -197,7 +206,8 @@ ko.components.register("card", {
             <div data-bind="text: title"></div>
             <div class="flex justify-end flex-nowrap items-center gap-x-3">
                 <eye-button params="show: true, css: 'text-amber-200 hover:text-white', action: () => showContent(!showContent())"></eye-button>
-                <copy-icon-button params="show: showContent(), css: 'text-amber-200 hover:text-white', action:  () => console.log('copy')"></copy-icon-button>
+                <copy-icon-button 
+                params="show: showContent(), css: 'text-amber-200 hover:text-white', action: onCopy"></copy-icon-button>
             </div>
         </div>
         <div data-bind="if: showContent">
@@ -211,7 +221,8 @@ ko.components.register("card", {
         self.content = ko.observable(params.content)
         self.headerCss = ko.observable(params.headerCss)
         self.onCopy = function () {
-            params.copyAction();
+            //params.copyAction();
+            copyText(self.content())
         }
     }
 
@@ -224,7 +235,7 @@ ko.components.register("input-card", {
             <div class="flex justify-end flex-nowrap items-center gap-x-3">
                 <eye-open-button params="show: !showContent(), css: 'text-amber-200 hover:text-white', action: () => showContent(true)"></eye-open-button>
                 <eye-closed-button params="show: showContent(), css: 'text-amber-200 hover:text-white', action:  () => showContent(false)"></eye-closed-button>
-                <copy-icon-button params="show: showContent(), css: 'text-amber-200 hover:text-white', action:  () => console.log('copy')"></copy-icon-button>
+                <copy-icon-button params="show: showContent(), css: 'text-amber-200 hover:text-white', action: onCopy"></copy-icon-button>
             </div>
         </div>
         <div data-bind="if: showContent">
@@ -239,7 +250,8 @@ ko.components.register("input-card", {
         self.headerCss = ko.observable(params.headerCss)
         self.contentCss = ko.observable(params.contentCss)
         self.onCopy = function () {
-            params.copyAction();
+            //params.copyAction();
+            copyText(self.content())
         }
     }
 
@@ -257,6 +269,10 @@ class ViewModel {
         self.showInputContent = ko.observable(true)
 
         self.inputHtml = ko.observable(Settings.Templates.CSharp.InitialClass);
+        
+        self.copytext = ko.observable("");
+
+
 
         self.copy = function (text) {
             if (navigator && navigator.clipboard) {
