@@ -339,22 +339,25 @@ public partial class ${self.className()}Filter: ObservableObject
 
         self.filterAttributes = ko.pureComputed(function () {
 
+            //const L = (t) => Settings.Templates.CSharp.Controller.Filter.Linq[t] 
+            const CT = (t) => Settings.CompareTypes[t] || "not found"
+
             const body = self.properties().map(x => 
                 { 
-                    const t = Settings.Templates.Blazor.Types[x[1]];
-                    const tl = x[1].replace("?","")
-                    switch (t) {
-                        case "number":
-                            return `${tl}? ${x[0].toCamelCase()}Min, ${tl}? ${x[0].toCamelCase()}Max`
+                    const tl = x[1].replace("?","") + "?"
+                    const ct = CT(x[1]);
+
+                    switch (ct) {
+                        case "ordinal":
+                            return `${tl} ${x[0].toCamelCase()}Min, ${tl} ${x[0].toCamelCase()}Max`
                             
-                        case "datetime":
-                            return `${tl}? ${x[0].toCamelCase()}Min, ${tl}? ${x[0].toCamelCase()}Max`
+                        case "ordinal?":
+                            return `${tl} ${x[0].toCamelCase()}Min, ${tl} ${x[0].toCamelCase()}Max`
                             
                     
                         default:
-                            return `${tl}? ${x[0].toCamelCase()}`
+                            return `${tl} ${x[0].toCamelCase()}`
                     }
-                return 
             }
             )
             .join(', ')
@@ -366,14 +369,17 @@ public partial class ${self.className()}Filter: ObservableObject
         self.linqFilter = ko.pureComputed(function () {
             const className = self.className().toCamelCase()
 
-            const L = (t) => Settings.Templates.CSharp.Controller.Filter.Linq[t] || `// ?? ${t} ??`
+            const L = (t) => Settings.Templates.CSharp.Controller.Filter.Linq[t] 
+            const CT = (t) => Settings.CompareTypes[t] || "not found"
 
             const body = self.properties().map(x =>
-                L(x[1])
+                L(CT(x[1]))
                     .replace(/\{model\}/g, className)
                     .replace(/\{Property\}/g, x[0])
             ).join('\r\n')
 
+            
+            
             return body
         })
 
