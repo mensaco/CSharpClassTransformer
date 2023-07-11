@@ -1,4 +1,73 @@
 const Settings = {
+    "CompareTypes": {
+
+        "sbyte ": "ordinal",
+        "byte ": "ordinal",
+        "short ": "ordinal",
+        "ushort": "ordinal",
+        "int ": "ordinal",
+        "uint ": "ordinal",
+        "long ": "ordinal",
+        "ulong ": "ordinal",
+        "nint ": "ordinal",
+        "nuint ": "ordinal",
+
+        "sbyte?": "ordinal?",
+        "byte?": "ordinal?",
+        "short?": "ordinal?",
+        "ushor?": "ordinal?",
+        "int?": "ordinal?",
+        "uint?": "ordinal?",
+        "long?": "ordinal?",
+        "ulong?": "ordinal?",
+        "nint?": "ordinal?",
+        "nuint?": "ordinal?",
+
+        "System.SByte": "ordinal",
+        "System.Byte": "ordinal",
+        "System.Int16": "ordinal",
+        "System.UInt16": "ordinal",
+        "System.Int32": "ordinal",
+        "System.UInt32": "ordinal",
+        "System.Int64": "ordinal",
+        "System.UInt64": "ordinal",
+        "System.IntPtr": "ordinal",
+        "System.UIntPtr": "ordinal",
+
+        "System.SByte?": "ordinal?",
+        "System.Byte?": "ordinal?",
+        "System.Int16?": "ordinal?",
+        "System.UInt16?": "ordinal?",
+        "System.Int32?": "ordinal?",
+        "System.UInt32?": "ordinal?",
+        "System.Int64?": "ordinal?",
+        "System.UInt64?": "ordinal?",
+        "System.IntPtr?": "ordinal?",
+        "System.UIntPtr?": "ordinal?",
+
+        "DateTime": "ordinal",
+        "DateTime?": "ordinal?",
+
+        "string": "text",
+        "string?": "text?",
+
+        "System.String": "text",
+        "System.String?": "text?",
+
+        "bool": "cardinal",
+        "bool?": "cardinal?",
+
+        "System.Boolean": "cardinal",
+        "System.Boolean?": "cardinal?",
+
+        "Guid": "cardinal",
+        "Guid?": "cardinal?",
+
+        "System.Guid": "cardinal",
+        "System.Guid?": "cardinal?"
+
+
+    },
     "RegExp": {
         "ForC#ClassName": {
             "Expression": `class (.+?)[ \\r\\n\\t]+\\{`,
@@ -122,55 +191,94 @@ public partial class {Model}Filter:  ObservableObject
                 "Filter": {
                     "Class": ``,
                     "Linq": {
-                        "string": `if({model}Filter.{Property} != null) 
+                        "ordinal": `if({model}Filter.{Property}Max != null) {
+    q = q.Where(x => x.{Property} <= {model}Filter.{Property}Max);
+}
+if({model}Filter.{Property}Min != null) {
+    q = q.Where(x => x.{Property} >= {model}Filter.{Property}Min);
+}                        
+                        `,
+                        "ordinal?": `if({model}Filter.{Property}Max != null && {model}Filter.{Property}Max != null ) {
+    q = q.Where(x => x.{Property} <= {model}Filter.{Property}Max);
+}
+if({model}Filter.{Property}Min != null && {model}Filter.{Property}Min != null ) {
+    q = q.Where(x => x.{Property} >= {model}Filter.{Property}Min);
+}                        
+                        `,
+
+                        "text": `if({model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
-}`,
-                        "string?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
-}`,
-                        "System.String": `if({model}Filter.{Property} != null) 
+}
+                        `,
+                        "text?": `if({model}Filter.{Property} != null && {model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
-}`,
-                        "System.String?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
-}`,
-                        "bool": `if({model}Filter.{Property} != null) 
+}
+                        `,
+                        "cardinal": `if({model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property} == {model}Filter.{Property});
-}`,
-                        "bool?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
-}`,
-                        "int": `if({model}Filter.{Property} != null) 
+}
+                        `,
+                        "cardinal?": `if({model}Filter.{Property} != null && {model}Filter.{Property} != null) 
 {
     q = q.Where(x => x.{Property} == {model}Filter.{Property});
-}`,
-                        "int?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
-}`,
-                        "System.UInt64": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} == {model}Filter.{Property});
-}`,
-                        "System.UInt64?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
-}`,
-                        "Guid": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} == {model}Filter.{Property});
-}`,
-                        "Guid?": `if({model}Filter.{Property} != null) 
-{
-    q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
-}`,
-                    }
+}
+                        `,
+                        "not found": "// **** CompareType not found for {model}Filter.{Property} ****"
+
+                    },
+//                     "Linq": {
+//                         "string": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
+// }`,
+//                         "string?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
+// }`,
+//                         "System.String": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property}.Contains({model}Filter.{Property}));
+// }`,
+//                         "System.String?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property}.Contains({model}Filter.{Property}));
+// }`,
+//                         "bool": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "bool?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "int": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "int?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "System.UInt64": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "System.UInt64?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "Guid": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} == {model}Filter.{Property});
+// }`,
+//                         "Guid?": `if({model}Filter.{Property} != null) 
+// {
+//     q = q.Where(x => x.{Property} != null && x.{Property} == {model}Filter.{Property});
+// }`,
+//                     }
                 }
             }
         },
@@ -240,24 +348,24 @@ public partial class ${window.vM.className ? window.vM.className() : ""
 `
 
         },
-        {
-            title: "Linq filter",
-            mapping: (x) => (Settings.Templates.CSharp.Controller.Filter.Linq[x[1]]??"").replace(/\{model\}/gi,  Camel(vM.className()) ).replace(/\{Property\}/gi,  x[1]) 
-        },
+        // {
+        //     title: "Linq filter",
+        //     mapping: (x) => (Settings.Templates.CSharp.Controller.Filter.Linq[x[1]] ?? "").replace(/\{model\}/gi, Camel(vM.className())).replace(/\{Property\}/gi, x[1])
+        // },
         {
             title: "Blazor displays",
             mapping: (x) => Settings.Templates.Blazor.Display
-                .replace(/\{model\}/gi, "@" + Camel(vM.className()) )
-                .replace(/\{label\}/gi,  x[0]) 
-                .replace(/\{property\}/gi,  x[0]) 
+                .replace(/\{model\}/gi, "@" + Camel(vM.className()))
+                .replace(/\{label\}/gi, x[0])
+                .replace(/\{property\}/gi, x[0])
         },
         {
             title: "Blazor inputs",
             mapping: (x) => Settings.Templates.Blazor.Input
-                .replace(/\{model\}/gi, Camel(vM.className()) )
-                .replace(/\{label\}/gi,  x[0]) 
-                .replace(/\{property\}/gi,  x[0]) 
-                .replace(/\{type\}/gi,  Settings.Templates.Blazor.Types[x[1]]) 
+                .replace(/\{model\}/gi, Camel(vM.className()))
+                .replace(/\{label\}/gi, x[0])
+                .replace(/\{property\}/gi, x[0])
+                .replace(/\{type\}/gi, Settings.Templates.Blazor.Types[x[1]])
         },
     ]
 
