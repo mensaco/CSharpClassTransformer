@@ -339,7 +339,25 @@ public partial class ${self.className()}Filter: ObservableObject
 
         self.filterAttributes = ko.pureComputed(function () {
 
-            const body = self.properties().map(x => `string? ${x[0].toCamelCase()}`).join(', ')
+            const body = self.properties().map(x => 
+                { 
+                    const t = Settings.Templates.Blazor.Types[x[1]];
+                    const tl = x[1].replace("?","")
+                    switch (t) {
+                        case "number":
+                            return `${tl}? ${x[0].toCamelCase()}Min, ${tl}? ${x[0].toCamelCase()}Max`
+                            
+                        case "datetime":
+                            return `${tl}? ${x[0].toCamelCase()}Min, ${tl}? ${x[0].toCamelCase()}Max`
+                            
+                    
+                        default:
+                            return `${tl}? ${x[0].toCamelCase()}`
+                    }
+                return 
+            }
+            )
+            .join(', ')
 
             return body
         })

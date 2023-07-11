@@ -218,12 +218,11 @@ public partial class {Model}Filter:  ObservableObject
             source: () => (window.vM.keyProperties ? window.vM.keyProperties() : undefined),
             mapping: (x) => x
         },
-
-        {
-            title: "Filter attributes",
-            mapJoiner: ', ',
-            mapping: (x) => 'string? ' + Camel(x[0])
-        },
+        // {
+        //     title: "Filter attributes",
+        //     mapJoiner: ', ',
+        //     mapping: (x) => 'string? ' + Camel(x[0]) 
+        // },
         {
             title: "C# filter class:",
             pretext: (x) => `using CommunityToolkit.Mvvm.ComponentModel;
